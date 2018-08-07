@@ -38,7 +38,7 @@ curl_close($ch);
 
 //запрос списка
 $func = "dedic.order";
-
+        //"dedic";
 $url = "https://{$ip}:1500/{$manager}?auth={$session_id}&out={$format}&func={$func}";
 echo $url . "\n";
 
@@ -53,7 +53,11 @@ if($output === FALSE) {
     curl_error($ch) . "\n";
 } else {
     $output = json_decode($output, true);
-    var_dump($output);
+    foreach($output['doc']['list'][0]['elem'] as $tarif) {
+        $tarif_desc = $tarif['desc']['$'];
+        $tarif_id = $tarif['pricelist']['$'];
+        echo "tarif {$tarif_desc} has id = {$tarif_id}" . "\n";
+    }
 }
 
 curl_close($ch);
