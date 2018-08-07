@@ -6,17 +6,20 @@ echo $username ."\n";
 $password = file_get_contents('password.txt'); $password = trim($password);
 echo $password . "\n";
 $manager = 'billmgr';
+$format = 'json';
 
-$url = //"http://{$ip}/{$manager}?out=xml&func=auth&username={$username}&password={$password}";
-       "https://{$ip}:1500/{$manager}?out=xml&func=auth&username={$username}&password={$password}";
+$url = //"http://{$ip}/{$manager}?out={$format}&func=auth&username={$username}&password={$password}";
+       "https://{$ip}:1500/{$manager}?out={$format}&func=auth&username={$username}&password={$password}";
 echo $url . "\n";
 
 //-----------------------------------------------------------Вариант с php curl-------------------------------------------------------//
 
-$ch = curl_init($url);
-//$fp = fopen("billmgr_output.txt", "w");
 
-// curl_setopt($ch, CURLOPT_FILE, $fp);
+
+//авторизация
+
+$ch = curl_init($url);
+
 curl_setopt($ch, CURLOPT_HEADER, 0);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -25,11 +28,38 @@ $output = curl_exec($ch);
 if($output === FALSE) {    
     curl_error($ch) . "\n";
 } else {
-    echo "\n" . $output . "\n";
+    $output = json_decode($output, true);
+    $session_id = $output['doc']['auth']['$id'];
+    echo "session id = " . $session_id . "\n";
 }
 
 curl_close($ch);
-//fclose($fp);
+//авторизация
+
+//запрос списка
+$func = "dedic.order";
+
+$url = "https://{$ip}:1500/{$manager}?auth={$session_id}&out={$format}&func={$func}";
+echo $url . "\n";
+
+$ch = curl_init($url);
+
+curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
+$output = curl_exec($ch);
+if($output === FALSE) {    
+    curl_error($ch) . "\n";
+} else {
+    $output = json_decode($output, true);
+    var_dump($output);
+}
+
+curl_close($ch);
+//запрос списка
+
+
 
 //-----------------------------------------------------------Вариант с php curl-------------------------------------------------------//
 
