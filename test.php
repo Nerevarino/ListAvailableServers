@@ -2,15 +2,15 @@
 
 $ip = '62.173.154.3';
 $username = file_get_contents('login.txt'); $username = trim($username);
-echo $username ."\n";
+//echo $username ."\n";
 $password = file_get_contents('password.txt'); $password = trim($password);
-echo $password . "\n";
+//echo $password . "\n";
 $manager = 'billmgr';
 $format = 'json';
 
-$url = //"http://{$ip}/{$manager}?out={$format}&func=auth&username={$username}&password={$password}";
-       "https://{$ip}:1500/{$manager}?out={$format}&func=auth&username={$username}&password={$password}";
-echo $url . "\n";
+// $url = //"http://{$ip}/{$manager}?out={$format}&func=auth&username={$username}&password={$password}";
+//        "https://{$ip}:1500/{$manager}?out={$format}&func=auth&username={$username}&password={$password}";
+// echo $url . "\n";
 
 //-----------------------------------------------------------Вариант с php curl-------------------------------------------------------//
 
@@ -18,29 +18,29 @@ echo $url . "\n";
 
 //авторизация
 
-$ch = curl_init($url);
+// $ch = curl_init($url);
 
-curl_setopt($ch, CURLOPT_HEADER, 0);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+// curl_setopt($ch, CURLOPT_HEADER, 0);
+// curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+// curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
-$output = curl_exec($ch);
-if($output === FALSE) {    
-    curl_error($ch) . "\n";
-} else {
-    $output = json_decode($output, true);
-    $session_id = $output['doc']['auth']['$id'];
-    echo "session id = " . $session_id . "\n";
-}
+// $output = curl_exec($ch);
+// if($output === FALSE) {    
+//     curl_error($ch) . "\n";
+// } else {
+//     $output = json_decode($output, true);
+//     $session_id = $output['doc']['auth']['$id'];
+//     echo "session id = " . $session_id . "\n";
+// }
 
-curl_close($ch);
+// curl_close($ch);
 //авторизация
 
 //запрос списка
 $func = "dedic.order";
         //"dedic";
-$url = "https://{$ip}:1500/{$manager}?auth={$session_id}&out={$format}&func={$func}";
-echo $url . "\n";
+$url = "https://{$ip}:1500/{$manager}?authinfo={$username}:{$password}&out={$format}&func={$func}";
+echo $url . "\n\n";
 
 $ch = curl_init($url);
 
@@ -56,7 +56,8 @@ if($output === FALSE) {
     foreach($output['doc']['list'][0]['elem'] as $tarif) {
         $tarif_desc = $tarif['desc']['$'];
         $tarif_id = $tarif['pricelist']['$'];
-        echo "tarif {$tarif_desc} has id = {$tarif_id}" . "\n";
+        $tarif_price = $tarif['price']['$'];
+        echo "{$tarif_desc}\t\t{$tarif_id}\t\t{$tarif_price}\n";
     }
 }
 
